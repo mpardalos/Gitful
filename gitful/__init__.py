@@ -2,7 +2,6 @@ import sys
 
 import os
 from flask import Flask
-from flask_restful import Api
 
 app = Flask(__name__)
 
@@ -15,8 +14,6 @@ if 'dev' in sys.argv:
 
 if not os.path.exists(app.config['REPOS_DIR']):
     os.mkdir(app.config['REPOS_DIR'])
-
-api = Api(app)
 
 from . import endpoints
 

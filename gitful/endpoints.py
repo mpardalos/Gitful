@@ -1,15 +1,18 @@
+from flask import jsonify
 from flask_restful import Resource
 
-from . import app, api
+from . import app
 
-class Repositories(Resource):
-    def get(self):
-        pass
+@app.route('/repos', methods=['GET'])
+def get_all_repos():
+    pass
 
-    def post(self):
-        pass
+@app.route('/repos', methods=['POST'])
+def create_repo():
+    pass
 
-class Repository(Resource):
-    def get(self, repo_id):
-        pass
+@app.route('/repos/<int:repo_id>', methods=['GET'])
+def get_repo(repo_id):
+    pass
+
 
