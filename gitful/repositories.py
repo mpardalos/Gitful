@@ -14,7 +14,6 @@ class ConfigNotFound(FileNotFoundError): pass
 
 class Repository():
     def __init__(self, id):
-
         self.path = repos_dir/str(id)
         if not self.path.exists():
             raise RepoNotFound()
@@ -27,6 +26,11 @@ class Repository():
 
         self._repo = git.Repo(self.path)
         self.id = id
+
+    @classmethod
+    def all(cls):
+        for repo_dir in repos_dir.iterdir():
+            yield Repository(repo_dir.name)
 
     @property
     def name(self):

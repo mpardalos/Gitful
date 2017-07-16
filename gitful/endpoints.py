@@ -6,7 +6,13 @@ from .repositories import Repository, RepoNotFound
 
 @app.route('/repos', methods=['GET'])
 def get_all_repos():
-    pass
+    return jsonify([
+        {
+            "id": repo.id,
+            "name": repo.name
+        }
+        for repo in Repository.all()
+    ])
 
 @app.route('/repos', methods=['POST'])
 def create_repo():
