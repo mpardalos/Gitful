@@ -2,6 +2,7 @@ from flask import jsonify
 from flask_restful import Resource
 
 from . import app
+from .repositories import Repository, RepoNotFound
 
 @app.route('/repos', methods=['GET'])
 def get_all_repos():
@@ -13,6 +14,16 @@ def create_repo():
 
 @app.route('/repos/<int:repo_id>', methods=['GET'])
 def get_repo(repo_id):
-    pass
+    try:
+        repo = Repository(repo_id)
+    except RepoNotFound:
+        return jsonify({
+            'error': 'no repository with that id exists'
+        }), 404
+    else:
+        return jsonify({
+            "id": repo.id,
+            "name": repo.name
+        })
 
 
