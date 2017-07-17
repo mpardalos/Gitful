@@ -11,6 +11,7 @@ class ResponseException(Exception):
         self.status_code = status_code or type(self).status_code
         self.message = message or type(self).message
 
+
 @app.errorhandler(ResponseException)
 def response_exception_handler(error):
     response = jsonify({
@@ -25,3 +26,7 @@ class RepoNotFound(ResponseException):
     status_code = 404
     message = "The Repo you requested was not found"
 
+
+class InvalidRequest(ResponseException):
+    status_code = 400  # Bad Request
+    message = "The request you made was not valid"

@@ -1,8 +1,10 @@
-from flask import jsonify
-from flask_restful import Resource
+from flask import jsonify, request, url_for
+from werkzeug.exceptions import BadRequest
 
 from . import app
+from .exceptions import InvalidRequest
 from .repositories import Repository
+
 
 @app.route('/repos', methods=['GET'])
 def get_all_repos():
@@ -14,9 +16,24 @@ def get_all_repos():
         for repo in Repository.all()
     ])
 
+
 @app.route('/repos', methods=['POST'])
 def create_repo():
-    pass
+    try:
+        args = request.json
+    except BadRequest:
+        raise InvalidRequest(message="Your request must contain a json body")
+
+    if "name" not in args:
+        raise InvalidRequest(message="Your request must contain a name field")
+
+    repo = Repository(args['name'])
+
+    return jsonify({
+        "id": repo.id,
+        "url": url_for('get_repo', repo_id=repo.id)
+    })
+
 
 @app.route('/repos/<int:repo_id>', methods=['GET'])
 def get_repo(repo_id):
@@ -25,5 +42,3 @@ def get_repo(repo_id):
         "id": repo.id,
         "name": repo.name
     })
-
-
