@@ -1,60 +1,95 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
-  </div>
+    <div id="app" class="container-fluid">
+        <b-list-group>
+            <b-list-group-item v-for="repo in repos" :key="repo.id">
+                <span class="label">{{ repo.id }}:</span> {{ repo.name }}
+            </b-list-group-item>
+        </b-list-group>
+
+        <div class="right-align mtop-10">
+            <b-button v-b-modal.add-repo-modal>
+                Add a repo
+            </b-button>
+        </div>
+
+        <b-modal id="add-repo-modal" title="Create a new repo" @ok="createRepo">
+
+            <b-form-input v-model="newRepoName" type="text" placeholder="Repo Name">
+            </b-form-input>
+
+        </b-modal>
+    </div>
 </template>
 
 <script>
     export default {
         name: 'app',
-        data () {
+
+        mounted: function() {
+            this.refreshRepos();
+        },
+
+        data: function() {
             return {
-                msg: 'Welcome to Your Vue.js App'
+                newRepoName: "",
+
+                repos: []
+            }
+        },
+
+        methods: {
+            refreshRepos: function() {
+                fetch('/api/repos')
+                    .then(response => response.json())
+                    .then(json => json.sort((a, b) => a.id - b.id ))
+                    .then(repos => this.repos = repos)
+            },
+
+            createRepo: function() {
+                fetch('/api/repos', {
+                    method: 'POST',
+                    headers: {"Content-Type":"application/json"},
+                    body: JSON.stringify({name: this.newRepoName})
+                })
+                    .then(response => {
+                        if (response.status === 200){
+                            this.refreshRepos();
+                        } else {
+                            alert("There was a problem creating the repo");
+                        }
+                    })
             }
         }
     }
 </script>
 
 <style>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  }
+    #app {
+        font-family: 'Avenir', Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #2c3e50;
+        margin-top: 30px;
+    }
 
-  h1, h2 {
-    font-weight: normal;
-  }
+    h1, h2 {
+        font-weight: normal;
+    }
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
+    a {
+        color: #42b983;
+    }
 
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
+    .label {
+        margin-right: 15px;
+        font-weight: bolder;
+    }
 
-  a {
-    color: #42b983;
-  }
+    .right-align {
+        text-align: right;
+    }
+
+    .mtop-10 {
+        margin-top: 10px;
+    }
 </style>
