@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from . import app
+from . import api
 
 
 class ResponseException(Exception):
@@ -12,7 +12,7 @@ class ResponseException(Exception):
         self.message = message or type(self).message
 
 
-@app.errorhandler(ResponseException)
+@api.errorhandler(ResponseException)
 def response_exception_handler(error):
     response = jsonify({
         "type": type(error).__name__,

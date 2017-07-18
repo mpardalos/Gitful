@@ -1,12 +1,12 @@
 from flask import jsonify, request, url_for
 from werkzeug.exceptions import BadRequest
 
-from . import app
+from . import api
 from .exceptions import InvalidRequest
 from .repositories import Repository
 
 
-@app.route('/repos', methods=['GET'])
+@api.route('/repos', methods=['GET'])
 def get_all_repos():
     return jsonify([
         {
@@ -17,7 +17,7 @@ def get_all_repos():
     ])
 
 
-@app.route('/repos', methods=['POST'])
+@api.route('/repos', methods=['POST'])
 def create_repo():
     try:
         args = request.json
@@ -31,11 +31,11 @@ def create_repo():
 
     return jsonify({
         "id": repo.id,
-        "url": url_for('get_repo', repo_id=repo.id)
+        "url": url_for('api.get_repo', repo_id=repo.id)
     })
 
 
-@app.route('/repos/<int:repo_id>', methods=['GET'])
+@api.route('/repos/<int:repo_id>', methods=['GET'])
 def get_repo(repo_id):
     repo = Repository.from_id(repo_id)
     return jsonify({

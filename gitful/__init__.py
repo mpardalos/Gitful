@@ -2,9 +2,11 @@ import os
 import sys
 from pathlib import Path
 
-from flask import Flask
+from flask import Flask, Blueprint
 
 app = Flask(__name__)
+
+api = Blueprint("api", __name__)
 
 if 'dev' in sys.argv:
     app.config.update(
@@ -25,3 +27,5 @@ if not os.path.exists(app.config['REPOS_DIR']):
 
 # noinspection PyPep8
 from . import endpoints
+
+app.register_blueprint(api, url_prefix="/api")
