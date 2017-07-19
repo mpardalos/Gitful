@@ -1,9 +1,12 @@
 <template>
     <div id="app" class="container-fluid">
         <b-list-group>
-            <b-list-group-item v-for="repo in repos" :key="repo.id">
-                <span class="label">{{ repo.id }}:</span> {{ repo.name }}
-            </b-list-group-item>
+            <transition-group name="list-left-slide-fade">
+                <b-list-group-item v-for="repo in repos" :key="repo.id">
+                    <span class="label">{{ repo.id }}:</span> {{ repo.name }}
+                    <b-button class="m-left-auto" :variant="'danger'" @click="deleteTarget = repo">Delete</b-button>
+                </b-list-group-item>
+            </transition-group>
         </b-list-group>
 
         <div class="right-align mtop-10">
@@ -18,10 +21,17 @@
             </b-form-input>
 
         </b-modal>
+
+        <b-modal id="delete-repo-modal" title="Are you sure?" v-model="showModal"
+                 @ok="deleteRepo(deleteTarget.id)" @hidden="deleteTarget=undefined">
+            Do you want to delete {{ deleteTarget ? deleteTarget.name : "" }}?
+        </b-modal>
     </div>
 </template>
 
 <script>
+    import _ from 'lodash'
+
     export default {
         name: 'app',
 
@@ -33,8 +43,14 @@
             return {
                 newRepoName: "",
 
-                repos: []
+                repos: [],
+
+                deleteTarget: undefined
             }
+        },
+
+        computed: {
+            showModal: function() { return this.deleteTarget !== undefined}
         },
 
         methods: {
@@ -58,6 +74,20 @@
                             alert("There was a problem creating the repo");
                         }
                     })
+            },
+
+            deleteRepo: function(repo_id) {
+                fetch('/api/repos/' + repo_id, {
+                    method: 'DELETE',
+                    headers: {"Content-Type": "application/json"},
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            this.repos = _.reject(this.repos, r => r.id === repo_id)
+                        } else {
+                            alert("The repo could not be deleted")
+                        }
+                    })
             }
         }
     }
@@ -72,12 +102,8 @@
         margin-top: 30px;
     }
 
-    h1, h2 {
-        font-weight: normal;
-    }
-
-    a {
-        color: #42b983;
+    .m-left-auto {
+        margin-left: auto;
     }
 
     .label {
@@ -91,5 +117,14 @@
 
     .mtop-10 {
         margin-top: 10px;
+    }
+
+    .list-left-slide-fade-leave-active {
+        transition: all 0.5s ease
+    }
+
+    .list-left-slide-fade-leave-to {
+        opacity: 0;
+        transform: translateX(-30px);
     }
 </style>

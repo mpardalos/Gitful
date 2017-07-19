@@ -1,3 +1,5 @@
+import shutil
+
 from flask import jsonify, request, url_for
 from werkzeug.exceptions import BadRequest
 
@@ -42,3 +44,11 @@ def get_repo(repo_id):
         "id": repo.id,
         "name": repo.name
     })
+
+
+@api.route('/repos/<int:repo_id>', methods=['DELETE'])
+def delete_repo(repo_id):
+    Repository.from_id(repo_id).destroy()
+    return '', 200
+
+

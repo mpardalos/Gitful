@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from pathlib import Path
 
 import git
@@ -65,3 +66,8 @@ class Repository:
     def all(cls):
         for repo_dir in filter(os.path.isdir, repos_dir.iterdir()):
             yield Repository.from_id(repo_dir.name)
+
+    def destroy(self):
+        shutil.rmtree(str(self.path))
+        del self
+
