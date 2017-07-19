@@ -31,10 +31,11 @@ def create_repo():
 
     repo = Repository(args['name'])
 
-    return jsonify({
+    response = jsonify({
         "id": repo.id,
-        "url": url_for('api.get_repo', repo_id=repo.id)
     })
+    response.headers['Location'] = url_for('api.get_repo', repo_id=repo.id)
+    return response
 
 
 @api.route('/repos/<int:repo_id>', methods=['GET'])
